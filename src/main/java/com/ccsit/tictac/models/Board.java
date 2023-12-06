@@ -5,9 +5,11 @@ import java.util.List;
 
 public class Board {
     List<List<Cell>> board;
+    Cell[][] matrix ;
 
     public Board(int dimension) {
         this.board  = new ArrayList<List<Cell>>();
+        Cell[][] matrix  = new Cell[dimension][dimension];
         for(int i=0;i<dimension;i++){
             List<Cell> li = new ArrayList<>();
             for(int j=0;j<dimension;j++){
@@ -16,6 +18,14 @@ public class Board {
             }
             this.board.add(li);
         }
+    }
+
+    public Cell[][] getMatrix() {
+        return matrix;
+    }
+
+    public void setMatrix(Cell[][] matrix) {
+        this.matrix = matrix;
     }
 
     public List<List<Cell>> getBoard() {

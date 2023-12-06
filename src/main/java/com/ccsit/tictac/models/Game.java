@@ -11,6 +11,7 @@ public class Game {
     GameStatus gameStatus;
     List<Move> moves;
     int nextPlayerIndex;
+    int totalMoves =0;
 
     private Game(Builder builder){
        this.board = new Board(builder.getDimension());
@@ -18,6 +19,7 @@ public class Game {
         this.gameStatus = GameStatus.INPROGRESS;
         this.moves = new ArrayList<Move>();
         this.nextPlayerIndex = 0;
+        this.totalMoves = builder.getDimension()*builder.getDimension();
     }
 
     public static Builder getBuilder(){
@@ -85,12 +87,15 @@ public class Game {
         cell.setSymbol(p.getSymbol());
         Move move = new Move(cell,p);
         moves.add(move);
+        totalMoves--;
         this.nextPlayerIndex = (this.nextPlayerIndex+1)%this.players.size();
 
         if(CheckForWinner(move)){
             this.setGameStatus(GameStatus.WON);
-        }else{
-
+            return;
+        }
+        if(totalMoves == 0) {
+            this.setGameStatus(GameStatus.DRAWN);
         }
     }
 
@@ -99,24 +104,84 @@ public class Game {
      */
     private boolean CheckForWinner(Move move) {
 
+
+            boolean status = checkRowWiseWinning(move);
+            if(status) return true;
+
+            status = checkColWiseWinning(move);
+            if(status) return true;
+               status = checkDiagWiseWinning(move);
+            if(status) return true;
+
         return false;
     }
 
     private boolean isValidMove(int row, int col) {
-        if(row < 0 || col < 0 || row > this.players.size()+1 || col > this.players.size()+1) return false;
+        if(row < 0 || col < 0 || row > this.players.size() || col > this.players.size()) return false;
         Cell cell = board.getBoard().get(row).get(col);
         if(cell.getCellStatus() == CellStatus.FILLED) return false;
 
         return true;
     }
 
+    public boolean checkRowWiseWinning(Move move){
+        Cell cell = move.getCell();
+        Player p = move.getPlayer();
+
+        // check row wise
+        int r = cell.getRow();
+        int c  = cell.getCol();
+        for(int i=0;i<board.board.size();i++){
+            if(board.board.get(r).get(i).symbol != p.getSymbol()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkColWiseWinning(Move move){
+        Cell cell = move.getCell();
+        Player p = move.getPlayer();
+
+        // check row wise
+        int r = cell.getRow();
+        int c  = cell.getCol();
+        for(int i=0;i<board.board.size();i++){
+            if(board.board.get(i).get(r).symbol != p.getSymbol()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkDiagWiseWinning(Move move){
+        Cell cell = move.getCell();
+        Player p = move.getPlayer();
+
+        // check row wise
+        int r = cell.getRow();
+        int c  = cell.getCol();
+        if(r != c) return false;
+        for(int i=0;i<board.board.size();i++){
+            if(board.board.get(i).get(i).symbol != p.getSymbol()){
+                return false;
+            }
+        }
+        return true;
+    }
     /*
 
     *
      */
     public void display() {
 
-
+        for(int i=0;i<board.board.size();i++){
+            for(int j=0;j<board.getBoard().size();j++){
+                System.out.print(board.getBoard().get(i).get(j).symbol+" ");
+            }
+            System.out.println();
+        }
+        System.out.println("--------------------");
     }
 
     public static class Builder{
@@ -150,7 +215,7 @@ public class Game {
         }
 
         public Game build() throws Exception {
-             if(!isValid()) throw new Exception("Invalid Parameters");
+             if(!isValid()) throw new Exception("NO TWO PLAYERS SHOULD HAVE SAME SYMBOL");
             return new Game(this);
         }
         public boolean isValid(){

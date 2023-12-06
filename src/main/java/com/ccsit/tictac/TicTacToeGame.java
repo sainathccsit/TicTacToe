@@ -9,8 +9,10 @@ import com.ccsit.tictac.models.Move;
 import com.ccsit.tictac.models.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class TicTacToeGame {
 
@@ -29,24 +31,29 @@ public class TicTacToeGame {
             Player p = new Player(name,symbol.charAt(0),PlayerType.HUMAN);
             playerList.add(p);
         }
+        Game game;
+        try {
+        game= GameController.createGame(size,playerList);
+    }catch (Exception e){
+        System.out.println(e.getMessage());
+         return;
+    }
 
-     Game game = GameController.createGame(size,playerList);
         while(game.getGameStatus() == GameStatus.INPROGRESS){
             game.display();
             GameController.executeMove(game);
         }
-        // Get the Size of the boar N X N
-        // GEt the (N-1) player details ( name ,symbol)
-        // check is Bot playing in Game
 
-        // validate and Initialize the Game
-
-        /*
-             run game until it status moved to either won or drawn
-             while(game.status != GameStatus.INPROGRESS){
-
-             }
-         */
+        System.out.println("GAME STATUS: "+game.getGameStatus());
+        if(game.getGameStatus() == GameStatus.WON){
+            int lastMoveidx = game.getMoves().size();
+            Move lastMove = game.getMoves().get(lastMoveidx-1);
+            System.out.println("--------------");
+            System.out.println("Player "+lastMove.getPlayer().getName());
+            System.out.println("Player Symbol: "+lastMove.getPlayer().getSymbol());
+        }else{
+            System.out.println();
+        }
 
     }
 
