@@ -1,12 +1,10 @@
 package com.ccsit.tictac;
 
 import com.ccsit.tictac.controllers.GameController;
+import com.ccsit.tictac.enums.DifficultyLevel;
 import com.ccsit.tictac.enums.GameStatus;
 import com.ccsit.tictac.enums.PlayerType;
-import com.ccsit.tictac.models.Cell;
-import com.ccsit.tictac.models.Game;
-import com.ccsit.tictac.models.Move;
-import com.ccsit.tictac.models.Player;
+import com.ccsit.tictac.models.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +21,22 @@ public class TicTacToeGame {
         System.out.println("Size of the board is "+size+" X "+size);
         System.out.println("Please Enter Details of Players");
         List<Player> playerList = new ArrayList<Player>();
-        for(int i=1;i<size;i++){
+        System.out.println("Is There any Bot playing (Y/N): ");
+        String s = sc.next();
+        boolean isBotPlaying = false;
+        if(s.equalsIgnoreCase("Yes") || s.toLowerCase().charAt(0) == 'y' ){
+            isBotPlaying = true;
+            System.out.println("Enter Bot Symbol: ");
+            String symbol = sc.next();
+            Player p = new Bot("BOT",symbol.charAt(0),PlayerType.BOT, DifficultyLevel.MEDIUM);
+            playerList.add(p);
+        }
+        int i=1;
+        if(isBotPlaying){
+            i++;
+        }
+        for(;i<size;i++){
+
             System.out.println("Enter Player "+i+" Details: ");
             String name = sc.next();
             System.out.println("Enter Player "+i+" Symbol: ");
@@ -40,8 +53,8 @@ public class TicTacToeGame {
     }
 
         while(game.getGameStatus() == GameStatus.INPROGRESS){
-            game.display();
             GameController.executeMove(game);
+            game.display();
         }
 
         System.out.println("GAME STATUS: "+game.getGameStatus());

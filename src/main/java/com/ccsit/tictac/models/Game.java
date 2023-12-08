@@ -1,7 +1,12 @@
 package com.ccsit.tictac.models;
 
+import com.ccsit.tictac.botstratagy.BotEasyPlayStratagy;
+import com.ccsit.tictac.botstratagy.BotPlayingFactory;
+import com.ccsit.tictac.botstratagy.BotPlayingStratagy;
 import com.ccsit.tictac.enums.CellStatus;
+import com.ccsit.tictac.enums.DifficultyLevel;
 import com.ccsit.tictac.enums.GameStatus;
+import com.ccsit.tictac.enums.PlayerType;
 
 import java.util.*;
 
@@ -70,22 +75,30 @@ public class Game {
 
         Scanner sc = new Scanner(System.in);
         Player p =  this.getPlayers().get(this.getNextPlayerIndex());
-        System.out.println("Please Enter "+p.getName()+"'s move details");
-        System.out.println("Enter Row: ");
-        int row = sc.nextInt();
-        System.out.println("Enter col: ");
-        int col = sc.nextInt();
-        while(!isValidMove(row,col)){
+        Move move = null;
+        if(p.playerType == PlayerType.BOT){
+            move =  getBoatMove(p);
+
+        }else{
+            System.out.println("Please Enter "+p.getName()+"'s move details");
             System.out.println("Enter Row: ");
-             row = sc.nextInt();
+            int row = sc.nextInt();
             System.out.println("Enter col: ");
-             col = sc.nextInt();
+            int col = sc.nextInt();
+            while(!isValidMove(row,col)){
+                System.out.println("Please Enter "+p.getName()+"'s valid move details");
+                System.out.println("Enter Row: ");
+                row = sc.nextInt();
+                System.out.println("Enter col: ");
+                col = sc.nextInt();
+            }
+            Cell cell = board.getBoard().get(row).get(col);
+            cell.setCellStatus(CellStatus.FILLED);
+            cell.setPlayer(p);
+            cell.setSymbol(p.getSymbol());
+             move = new Move(cell,p);
+
         }
-        Cell cell = board.getBoard().get(row).get(col);
-        cell.setCellStatus(CellStatus.FILLED);
-        cell.setPlayer(p);
-        cell.setSymbol(p.getSymbol());
-        Move move = new Move(cell,p);
         moves.add(move);
         totalMoves--;
         this.nextPlayerIndex = (this.nextPlayerIndex+1)%this.players.size();
@@ -99,11 +112,19 @@ public class Game {
         }
     }
 
+    private Move getBoatMove(Player player) {
+        Bot bot = (Bot)player;
+
+       BotPlayingStratagy stratagy = BotPlayingFactory.getInstance(bot.getDifficultyLevel());
+        Move move = stratagy.getMove(bot);
+
+            return move;
+    }
+
     /*
             Please implement winning logic
      */
     private boolean CheckForWinner(Move move) {
-
 
             boolean status = checkRowWiseWinning(move);
             if(status) return true;
@@ -157,17 +178,29 @@ public class Game {
     public boolean checkDiagWiseWinning(Move move){
         Cell cell = move.getCell();
         Player p = move.getPlayer();
-
+        int size = this.players.size();
         // check row wise
-        int r = cell.getRow();
-        int c  = cell.getCol();
-        if(r != c) return false;
-        for(int i=0;i<board.board.size();i++){
-            if(board.board.get(i).get(i).symbol != p.getSymbol()){
-                return false;
+        Boolean status = true;
+            for(int i=0;i<board.board.size();i++){
+                if(board.board.get(i).get(i).symbol != p.getSymbol()){
+                    status = false;
+                    break;
+                }
             }
-        }
-        return true;
+
+            if(status) return true;
+            status = true;
+
+            for(int i=size;i>=0;i--){
+
+                if(board.board.get(i).get(size-i).symbol != p.getSymbol()){
+                    status= false;
+                    break;
+                }
+            }
+
+        return status;
+
     }
     /*
 

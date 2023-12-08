@@ -5,10 +5,19 @@ import com.ccsit.tictac.enums.PlayerType;
 
 public class Bot extends Player{
 
-    DifficultyLevel difficultyLevel;
+    private DifficultyLevel difficultyLevel;
 
     public Bot(String name, char symbol, PlayerType playerType, DifficultyLevel difficultyLevel) {
         super(name, symbol, playerType);
+        this.difficultyLevel = difficultyLevel;
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+
         this.difficultyLevel = difficultyLevel;
     }
 }
